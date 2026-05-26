@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+
+  bot:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: berhayat_bot
+    restart: unless-stopped
+    env_file: ../.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../:/app
+    command: >
+      sh -c "alembic upgrade head && python main.py"
+    networks:
+      - berhayat_net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: berhayat_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       berhayat
+      POSTGRES_USER:     berhayat_user
+      POSTGRES_PASSWORD: berhayat_pass
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U berhayat_user -d berhayat"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - berhayat_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: berhayat_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - berhayat_net
+
+volumes:
+  pg_data:
+  redis_data:
+
+networks:
+  berhayat_net:
+    driver: bridge
