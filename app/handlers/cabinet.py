@@ -8,7 +8,7 @@ from datetime import date
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-from sqlalchemy import select, func, count
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.db import Employee, Deal, Shift, Document, RoleName
