@@ -17,7 +17,7 @@ from sqlalchemy.orm import (
 )
 
 
-class Base(AsyncAttrs, DeclarativeBase):
+class Base(DeclarativeBase)::
     pass
 
 
